@@ -5,28 +5,22 @@ import socket
 import binascii
 import time
 import sys
-import configparser
 from influxdb import InfluxDBClient
-
-
-config = configparser.RawConfigParser(allow_no_value=True)
-config.read("config.ini")
 
 
 ###########################
 # Variables
-
 # What address to listen to (0.0.0.0 means it will listen on all addresses)
-listen_address = config.get('DEFAULT', 'listen_address')
-listen_port = int(config.get('DEFAULT', 'listen_port'))
+listen_address = os.getenv('LISTEN_ADDRESS', '0.0.0.0')
+listen_port = int(os.getenv('LISTEN_PORT', '3200'))
 
-log_path = config.get('Logging', 'log_path', fallback='/var/log/ginlong/')
-do_raw_log = config.getboolean('Logging', 'do_raw_log')
+log_path = os.getenv('LOG_PATH', '/home/ginlong/')
+do_raw_log = bool(os.getenv('LOGGING', 'false'))
 
-influx_server = config.get('InfluxDB', 'influx_server')
-influx_port = int(config.get('InfluxDB', 'influx_port'))
-influx_database = config.get('InfluxDB', 'database')
-influx_measurement = config.get('InfluxDB', 'measurement')
+influx_server = os.getenv('INFLUX_SERVER', 'localhost')
+influx_port = int(os.getenv('INFLUX_PORT', '8086'))
+influx_database = os.getenv('DATABASE', 'telemetry')
+influx_measurement = os.getenv('MEASUREMENT', 'PV')
 
 if __debug__:
     print("running with debug")
@@ -112,7 +106,7 @@ while True:
                                     port=influx_port)
             success = client.write(json_body,
                                    # params isneeded, otherwise error 'database is required' happens
-                                   params={'db': influx_database})  
+                                   params={'db': influx_database})
 
             if not success:
                 print('error writing to database')

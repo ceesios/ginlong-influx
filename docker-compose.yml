@@ -1,0 +1,16 @@
+version: '3'
+services:
+  ginlong-influx:
+    container_name: ginlong-influx
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "3200:3200"
+    environment:
+      - TZ=Europe/Amsterdam
+      - LISTEN_PORT=3200
+      - LOGGING=true
+      - INFLUX_SERVER=192.168.1.51
+    restart: always
+    network_mode: host
